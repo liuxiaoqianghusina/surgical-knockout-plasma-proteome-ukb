@@ -1,0 +1,10 @@
+cache/
+results/
+figures/
+data/
+__pycache__/
+*.pkl
+*.csv
+*.xlsx
+*.tsv
+.DS_Store
