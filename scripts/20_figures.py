@@ -178,7 +178,7 @@ ax.scatter(P1.beta[sig],-np.log10(P1.p[sig]),s=2.5,color=RED,lw=0,rasterized=Tru
 off={"cd22":(3,4),"cr2":(3,-6),"fcer2":(3,-4),"tnfrsf13c":(3,3),"ccl20":(-24,3),"fcrl5":(3,-5),"tmprss11d":(3,-2),"slamf7":(-27,-3),"fcar":(-20,2)}
 for p in ["tmprss11d","ccl20","fcrl5","ly96","fcar","slamf7","mzb1","cd22","cr2","fcrl1","tnfrsf13c","fcer2","tcl1a"]:
     r=P1[P1.protein==p].iloc[0]; ax.annotate(p.upper(),(r.beta,-np.log10(r.p)),xytext=off.get(p,(3,1)),textcoords="offset points",fontsize=5)
-ax.set_xlim(-0.3,0.3); ax.set_xlabel("β (SD), tonsillectomy before age 16 vs never"); ax.set_ylabel("−log$_{10}$ $P$"); ax.legend(frameon=False,fontsize=5.5,loc="upper right",markerscale=3); plab(ax,"a",-0.18)
+ax.set_xlim(-0.3,0.3); ax.set_xlabel("β (SD), tonsillectomy before age 16 vs never"); ax.set_ylabel("−log$_{10}$ $P$"); ax.legend(frameon=False,fontsize=5.5,loc="lower left",bbox_to_anchor=(0,1.0),markerscale=3); plab(ax,"a",-0.18,1.18)
 outs=[("h_pta","Peritonsillar abscess or chronic tonsil disease"),("c_tonsil","Tonsil or oropharyngeal cancer"),("c_nhl","Non-Hodgkin lymphoma"),("c_hl","Hodgkin lymphoma"),
       ("h_pso","Psoriasis"),("h_asthma","Asthma"),("h_ibs","Irritable bowel syndrome"),("h_cd","Crohn's disease"),("h_uc","Ulcerative colitis"),("h_ms","Multiple sclerosis"),
       ("h_pneu","Pneumonia"),("h_koa","Knee osteoarthritis (negative control)"),("h_cataract","Cataract (negative control)")]
