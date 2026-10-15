@@ -200,4 +200,20 @@ for i,(ax,(o,p)) in enumerate(zip(axs.flat,kp)):
     if i%3==0: ax.set_ylabel("β (SD) vs never operated")
 fig.supxlabel("Years from surgery to blood draw",fontsize=6.5,y=0.0)
 save(fig,"SuppFig2")
+# ================= 补充图 3 第二套时钟 =================
+RCw=pd.read_csv(A+"m13_wang_clock_r.csv"); SIw=pd.read_csv(A+"m13_wang_specificity_index.csv"); SIo=pd.read_csv(A+"m09_clock_specificity_index.csv")
+fig=plt.figure(figsize=(170*MM,72*MM)); gs=gridspec.GridSpec(1,2,width_ratios=[0.75,1.45],wspace=0.95)
+ax=fig.add_subplot(gs[0]); ax.plot([0.1,1],[0.1,1],color=GREY,lw=0.5,ls="--"); ax.scatter(RCw.r_age_reported_UKB,RCw.r_age_reconstructed,s=7,color="black",zorder=3)
+off3={"Lung":(3,1),"Pancreas":(-5,-7),"Heart":(-5,3),"Muscle":(3,-5),"Intestine":(3,-4),"Kidney":(3,-2),"Immune":(-5,3),"Liver":(3,-5),"Artery":(-5,3),"Brain":(3,-5),"Organismal":(-5,3)}
+for r in RCw.itertuples():
+    dx,dy=off3.get(r.clock,(3,0)); ax.annotate(r.clock,(r.r_age_reported_UKB,r.r_age_reconstructed),xytext=(dx,dy),textcoords="offset points",fontsize=5,ha="right" if dx<0 else "left")
+ax.set_xlim(0.1,1); ax.set_ylim(0.1,1); ax.set_xlabel("Correlation with age, reported"); ax.set_ylabel("Correlation with age, rebuilt"); plab(ax,"a",-0.32,1.2)
+order3=["tonsil","appendix","spleen","stomach","colon","colon_right","small_bowel","kidney","lung","kidney_tx"]
+ax=fig.add_subplot(gs[1]); yy=np.arange(len(order3))[::-1]
+for k,(D_,c,dy,lb) in enumerate([(SIo,"black",0.15,"Oh and colleagues (published weights)"),(SIw,RED,-0.15,"Wang and colleagues (rebuilt)")]):
+    d=D_[D_.model=="主模型"].set_index("op").loc[order3]
+    ax.errorbar(d.specificity_index,yy+dy,xerr=[d.specificity_index-d.lo,d.hi-d.specificity_index],fmt="o",color=c,ms=2.5,capsize=1.2,elinewidth=0.6,capthick=0.6,label=lb)
+ax.axvline(0,color="black",lw=0.5); ax.set_yticks(yy); ax.set_yticklabels([f"{LAB[o]} → {SIo[SIo.op==o].target_clock.iloc[0]}" for o in order3],fontsize=5.5)
+ax.set_xlabel("Specificity index (SD): own-organ clock\nminus mean of other organ clocks"); ax.legend(frameon=False,fontsize=5.3,loc="lower left",bbox_to_anchor=(0,1.0),ncol=1); plab(ax,"b",-0.62,1.2)
+save(fig,"SuppFig3")
 print("done")

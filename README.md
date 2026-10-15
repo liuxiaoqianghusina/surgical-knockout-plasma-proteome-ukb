@@ -14,7 +14,7 @@ Public resources used:
 |---|---|---|
 | Human Protein Atlas, RNA tissue and single-cell type specificity | Tissue-origin analysis (`12_hpa_tissue_specificity.py`) | https://www.proteinatlas.org (download via the search API with columns `g,eg,up,rnats,rnatd,rnatsm,rnascs,rnascsm,rnabcs,rnabcsm`) |
 | Oh et al., *Nat Med* 2025, Supplementary Tables (ST2 organ-enriched Olink proteins; ST3 organ clock weights) | Organ clocks | doi:10.1038/s41591-025-03798-1 |
-| Wang et al., *Nat Aging* 2025, Supplementary Tables (ST3, ST4) | Organ clock protein lists | doi:10.1038/s43587-025-01016-8 |
+| Wang et al., *Nat Aging* 2025, Supplementary Tables (ST4 clock proteins; ST5 reported correlations with age) | Second organ clock set (`21_wang_clocks.py`) and organ-enriched protein lists | doi:10.1038/s43587-025-01016-8 |
 
 ## Setup
 
@@ -50,6 +50,7 @@ Analyses were run with Python 3.14 (pandas 2.3.3, NumPy 2.4.6, SciPy 1.17.1, sta
 | `17_clock_and_tonsil_supplementary.py` | eGFR-adjusted clocks, clock decomposition, organ-enriched protein fractions, tonsillectomy sensitivity analyses |
 | `18_clock_specificity_index.py` | Organ-clock specificity index with confidence intervals |
 | `19_table1.py` | Table 1 |
+| `21_wang_clocks.py` | Second organ clock set: weights re-estimated for the clock proteins of Wang et al. (tenfold cross-fitting), organ age gaps, removal effects and specificity index; run before `20_figures.py` |
 | `20_figures.py` | Main and supplementary figures (PDF and 600-dpi TIFF) |
 
 ## License
