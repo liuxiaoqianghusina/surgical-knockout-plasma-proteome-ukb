@@ -5,6 +5,7 @@ t0=time.time()
 d=pd.read_pickle("../cache/ops.pkl"); d["eid"]=d.eid.astype(int)
 codes=[c for c in d.columns if c.startswith("p20004_i0_")]
 L=pd.concat([pd.DataFrame({"eid":d.eid,"code":d[c],"age":pd.to_numeric(d[c.replace("p20004","p20011")],errors="coerce")}) for c in codes]); L=L[L.code.notna()]
+L.loc[L.age<0,"age"]=np.nan   # 20011：-1 不知道，-3 不愿回答 → 手术年龄未知
 def fa(cs): return L[L.code.isin(cs)].groupby("eid").age.min()
 ton=fa(["1478","1561"]); ade=fa(["1562"]); app=fa(["1458"])
 X=pd.DataFrame({"eid":d.eid,"sex":pd.to_numeric(d.p31,errors="coerce"),"byear":pd.to_numeric(d.p34,errors="coerce"),"age":pd.to_numeric(d.p21003_i0,errors="coerce"),
@@ -13,6 +14,7 @@ X=pd.DataFrame({"eid":d.eid,"sex":pd.to_numeric(d.p31,errors="coerce"),"byear":p
 X["ton_age"]=X.eid.map(ton); X["ade_only"]=(X.eid.isin(ade.index)&~X.eid.isin(ton.index)).astype(int); X["app_child"]=(X.eid.map(app)<20).astype(int)
 X=X.dropna(subset=["sex","byear","age","tdi","bmi","bdate"]); X=X[(X.smk>=0)&(X.ade_only==0)]
 X["tchild"]=(X.ton_age<16).astype(int); X["tadult"]=(X.ton_age>=20).astype(int)
+X=X[~(X.eid.isin(ton.index)&X.ton_age.isna())]   # 手术年龄未知者不纳入
 X=X[(X.ton_age.isna())|(X.ton_age<16)|(X.ton_age>=20)]
 o=pd.read_pickle("../cache/outcomes.pkl"); X=X.merge(o,on="eid",how="left")
 END=pd.Timestamp("2022-12-31")

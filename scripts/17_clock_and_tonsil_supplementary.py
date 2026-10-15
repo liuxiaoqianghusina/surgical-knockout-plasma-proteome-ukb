@@ -34,6 +34,7 @@ pd.DataFrame(fr,columns=["op","organ","n_Oh_enriched","frac_down_Oh","frac_up_Oh
 d=pd.read_pickle(f"{C}/ops.pkl"); d["eid"]=d.eid.astype(int)
 codes=[c for c in d.columns if c.startswith("p20004_i0_")]
 L=pd.concat([pd.DataFrame({"eid":d.eid,"code":d[c],"age":pd.to_numeric(d[c.replace("p20004","p20011")],errors="coerce")}) for c in codes]); L=L[L.code.notna()]
+L.loc[L.age<0,"age"]=np.nan   # 20011：-1 不知道，-3 不愿回答 → 手术年龄未知
 fa=lambda cs: L[L.code.isin(cs)].groupby("eid").age.min()
 ton=fa(["1478","1561"]); ade=fa(["1562"]); app=fa(["1458"])
 X["ton_age"]=X.eid.map(ton); X["ade"]=X.eid.isin(ade.index)&~X.eid.isin(ton.index); X["app_child"]=(X.eid.map(app)<20).astype(float)
@@ -41,7 +42,7 @@ for b in [1940,1945,1950,1955,1960,1965]: X[f"bc{b}"]=(X.byear>=b).astype(float)
 extra=[f"bc{b}" for b in [1940,1945,1950,1955,1960,1965]]+["app_child"]
 KEY=["tmprss11d","ccl20","fcrl5","ly96","fcar","slamf7","mzb1","cd22","cr2","fcrl1","tnfrsf13c","fcer2","tcl1a"]
 ol=load_olink().set_index("eid").loc[X.eid]; Y=ol[KEY].values.astype(float)
-never=X.ton_age.isna().values&~X.ade.values
+never=~X.eid.isin(ton.index).values&~X.ade.values   # 手术年龄未知者不纳入
 grad=[]
 for lab,lo,hi in [("<5",0,5),("5–9",5,10),("10–15",10,16),("16–19",16,20),("20–39",20,40),("≥40",40,200)]:
     e=(X.ton_age>=lo).values&(X.ton_age<hi).values; m=e|never
@@ -58,7 +59,7 @@ B,SE,P,N,NE=ols_many(child[mm].astype(float),design(Z[mm],False,ex2),Y[mm])
 EL=pd.DataFrame({"protein":KEY,"beta_sd_early_life_adjusted":B,"se":SE,"p":P,"n_removed":int(NE.max())}); EL.to_csv("../results/m07_tonsil_early_life.csv",index=False); print(EL.round(3).head(4))
 # 重复测定（i2）
 o2=pd.read_csv(f"{M}/olink_instance2.csv").rename(columns={"Participant.ID":"eid"}).set_index("eid")
-k2=[p for p in KEY if p in o2.columns]; S=X[X.eid.isin(o2.index)].copy(); child2=(S.ton_age<16).values; nev2=S.ton_age.isna().values&~S.ade.values; m=child2|nev2
+k2=[p for p in KEY if p in o2.columns]; S=X[X.eid.isin(o2.index)].copy(); child2=(S.ton_age<16).values; nev2=~S.eid.isin(ton.index).values&~S.ade.values; m=child2|nev2
 Y2=o2.loc[S.eid,k2].values.astype(float)
 B,SE,P,N,NE=ols_many(child2[m].astype(float),design(S[m],False,extra),Y2[m])
 RP=pd.DataFrame({"protein":k2,"beta_sd_repeat":B,"se":SE,"p":P,"n_removed":int(NE.max()),"n_total":int(N.max())}); RP.to_csv("../results/m07_tonsil_repeat.csv",index=False); print(RP.round(3))

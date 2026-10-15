@@ -29,6 +29,7 @@ def build():
     d=pd.read_pickle(f"{C}/ops.pkl"); d["eid"]=d.eid.astype(int)
     codes=[c for c in d.columns if c.startswith("p20004_i0_")]
     L=pd.concat([pd.DataFrame({"eid":d.eid,"code":d[c],"age":pd.to_numeric(d[c.replace("p20004","p20011")],errors="coerce")}) for c in codes]); L=L[L.code.notna()]
+    L.loc[L.age<0,"age"]=np.nan   # 20011：-1 不知道，-3 不愿回答 → 手术年龄未知
     X=pd.DataFrame({"eid":d.eid,"sex":pd.to_numeric(d.p31,errors="coerce"),"byear":pd.to_numeric(d.p34,errors="coerce"),"age":pd.to_numeric(d.p21003_i0,errors="coerce"),
       "tdi":pd.to_numeric(d.p189,errors="coerce"),"bmi":pd.to_numeric(d.p21001_i0,errors="coerce"),"smk":pd.to_numeric(d.p20116_i0,errors="coerce"),
       "white":(d.p21000_i0.fillna("").str[:1]=="1").astype(float),"centre":d.p54_i0,"bdate":pd.to_datetime(d.p53_i0,errors="coerce")})
